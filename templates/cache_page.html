@@ -1,0 +1,139 @@
+{% extends "navbar.html" %}
+
+{% block content %}
+    <a href="/" class="btn btn-primary ms-3">Back</a>
+{% endblock %}
+
+{% block time %}
+    <div id="time"></div>
+{% endblock %}
+
+{% block body %}
+<br>
+    <Form style="width: 700px;" onsubmit="return false">
+        <div class="mb-3 d-flex">
+            <input type="number" class="form-control" id="limitmessages" name="num_messages" min="1" max="100000" required placeholder="Number of messages you want:" value="{{ data }}">
+            <button class="btn btn-success" style="width: 100px;" id="getDataBtn" onclick="getInputValue()" disabled>Get Data</button>
+        </div>
+    </Form>
+    <div id="no_of_records" style="display: none;">{{ data }}</div>
+    <button onclick=updateCache() >Refresh Cache</button>
+    
+    <!-- <small style="opacity: 0.7; margin-left: 50px; margin-right: 50px;" >Cache will update in Every 5 min</small>
+    <small id="cache_update_status" style="opacity: 0.7; margin-right: 50px;"></small> -->
+{% endblock %}
+
+{% block js %}
+
+<script>
+    let selectedTopic = "test";
+    let currentPage = 1;
+    const limit = 10;
+    let table;
+    let no_of_records = document.getElementById("no_of_records").innerText;
+
+    function updateCache(){
+        const data = {
+            topic: selectedTopic,
+            no_of_records: 100,
+            draw: 1,
+            start: 0,
+            length: 10,
+            search: {
+                value: ""
+            }
+        };
+
+        fetch("/updateCache", {
+            method: "POST",         
+            headers: {
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(data) 
+        })
+        .then(res => res.json()) 
+        .then(data => {
+            console.log(data); 
+            table.ajax.reload();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+        }
+
+
+    function getInputValue() {
+        // Get the value from the input field
+        const numMessages = document.getElementById("limitmessages").value;
+        no_of_records =  numMessages
+        // console.log(no_of_records)
+        document.getElementById("dataTable").style.display = "table";
+        window.location.href = '/fetch_from_redis/'+ no_of_records; 
+        if (!$.fn.dataTable.isDataTable('#dataTable')) {
+            initializeTable();
+        }else {
+            table.ajax.reload();
+        }
+    }
+
+    document.getElementById('limitmessages').addEventListener('input', function() {
+        var inputValue = document.getElementById('limitmessages').value;
+        var button = document.getElementById('getDataBtn');
+        
+        if (inputValue !== "") {
+            button.disabled = false;
+        } else {
+            button.disabled = true;
+        }
+    });
+
+    function initializeTable() {
+        table = $('#dataTable').DataTable({
+            "processing": true, 
+            "serverSide": true,
+            "info": true,
+            "lengthChange": false,
+            "pageLength": limit,
+            "ajax": {
+                "url": "/getData_from_cache",
+                "type": "POST",
+                "contentType": "application/json",
+                "data": function(d) {
+                    d.topic = selectedTopic;
+                    d.no_of_records = no_of_records;
+                    return JSON.stringify(d);
+                },
+                "dataSrc": function(json) {
+                    $('#time').text("Time taken to load data: " + json.Time_taken + " seconds");
+                    return json.data; 
+                }
+            },
+            "columns": [
+                { "data": "id" },
+                { "data": "name" },
+                { "data": "email" },
+                { "data": "phone" },
+                { "data": "batch" },
+                {
+                    "data": "courses",
+                    "render": function(data) {
+                        return data.join(", ");
+                    }
+                }
+            ]
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        document.getElementById("dataTable").style.display = "table";
+        initializeTable();
+    })
+
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}
+
+</html>

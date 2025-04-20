@@ -1,0 +1,73 @@
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4CAF50;
+}
+
+/* Styling the table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Table headers */
+th {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 1.1rem;
+}
+
+/* Table cells */
+td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Hover effect for table rows */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Add a border to the table */
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+/* Styling for the table rows */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Footer section */
+footer {
+    text-align: center;
+    padding: 10px;
+    margin-top: 30px;
+    background-color: #4CAF50;
+    color: white;
+}
+
+#pagination{
+    margin-left: 45%;
+}
